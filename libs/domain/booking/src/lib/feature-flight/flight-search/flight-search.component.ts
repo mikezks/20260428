@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Flight } from '@flight-demo/domain/booking-api-boarding';
+import { BehaviorSubject } from 'rxjs';
 import { FlightService } from '../../logic-flight/data-access/flight.service';
-import { FlightFilter } from '../../logic-flight/model/flight-filter';
+import { Flight } from '../../logic-flight/model/flight';
 import { FlightCardComponent } from '../../ui-flight/flight-card/flight-card.component';
 import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filter.component';
-import { BehaviorSubject } from 'rxjs';
 
 
 @Component({
@@ -22,25 +21,33 @@ import { BehaviorSubject } from 'rxjs';
 export class FlightSearchComponent {
   private flightService = inject(FlightService);
 
-  protected filter = {
+  protected filter = signal({
     from: 'Paris',
     to: 'New York',
     urgent: false
-  };
+  });
   protected basket: Record<number, boolean> = {
     3: true,
     5: true
   };
   protected flights$ = new BehaviorSubject<Flight[]>([]);
 
-  protected search(filter: FlightFilter): void {
-    this.filter = filter;
+  constructor() {
+    effect(() => console.log(this.filter()));
+    effect(() => {
+      this.filter();
+      untracked(() => this.search());
+    });
+  }
 
-    if (!this.filter.from || !this.filter.to) {
+  protected search(): void {
+    if (!this.filter().from || !this.filter().to) {
       return;
     }
 
-    this.flightService.find(filter).subscribe(
+    this.flightService.find(
+      this.filter().from, this.filter().to, this.filter().urgent
+    ).subscribe(
       flights => this.flights$.next(flights)
     );
   }
