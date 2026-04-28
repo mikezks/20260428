@@ -25,24 +25,6 @@ export class PassengerEditComponent {
     ]]
   });
 
-  entityState = {
-    flights: {
-      3: {
-        id: 3,
-        from: 'Paris',
-        to: 'NYC'
-      },
-      5: {
-        id: 5,
-        from: 'London',
-        to: 'LA'
-      },
-    },
-    ids: [5, 3]
-  };
-
-  myFlight3 = this.entityState.flights[3];
-
   readonly id = input(0, { transform: numberAttribute });
   protected readonly passengerResource = httpResource<Passenger>(() => ({
     url: 'https://demo.angulararchitects.io/api/passenger',
