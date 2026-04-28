@@ -1,8 +1,9 @@
+import { httpResource } from '@angular/common/http';
 import { Component, effect, inject, input, numberAttribute } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { PassengerService } from '../../logic-passenger/data-access/passenger.service';
-import { validatePassengerStatus } from '../../util-validation/passenger-validator/passenger-status.validator';
 import { RouterLink } from '@angular/router';
+import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
+import { validatePassengerStatus } from '../../util-validation/passenger-validator/passenger-status.validator';
 
 
 @Component({
@@ -14,7 +15,6 @@ import { RouterLink } from '@angular/router';
   templateUrl: './passenger-edit.component.html'
 })
 export class PassengerEditComponent {
-  private readonly passengerService = inject(PassengerService);
   protected editForm = inject(NonNullableFormBuilder).group({
     id: [0],
     firstName: [''],
@@ -25,8 +25,31 @@ export class PassengerEditComponent {
     ]]
   });
 
+  entityState = {
+    flights: {
+      3: {
+        id: 3,
+        from: 'Paris',
+        to: 'NYC'
+      },
+      5: {
+        id: 5,
+        from: 'London',
+        to: 'LA'
+      },
+    },
+    ids: [5, 3]
+  };
+
+  myFlight3 = this.entityState.flights[3];
+
   readonly id = input(0, { transform: numberAttribute });
-  protected readonly passengerResource = this.passengerService.findByIdAsResource(this.id);
+  protected readonly passengerResource = httpResource<Passenger>(() => ({
+    url: 'https://demo.angulararchitects.io/api/passenger',
+    params: { id: this.id() }
+  }), {
+    defaultValue: initialPassenger
+  });
   
   constructor() {
     effect(() => console.log(this.id()));
