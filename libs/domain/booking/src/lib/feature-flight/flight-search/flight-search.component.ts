@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight } from '@flight-demo/domain/booking-api-boarding';
+import { BehaviorSubject } from 'rxjs';
 import { FlightService } from '../../logic-flight/data-access/flight.service';
-import { FlightFilter } from '../../logic-flight/model/flight-filter';
 import { FlightCardComponent } from '../../ui-flight/flight-card/flight-card.component';
 import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filter.component';
-import { BehaviorSubject } from 'rxjs';
 
 
 @Component({
@@ -38,16 +37,18 @@ export class FlightSearchComponent {
 
   constructor() {
     effect(() => console.log(this.route()));
+    effect(() => {
+      this.filter();
+      untracked(() => this.search());
+    });
   }
 
-  protected search(filter: FlightFilter): void {
-    this.filter.set(filter);
-
+  protected search(): void {
     if (!this.filter().from || !this.filter().to) {
       return;
     }
 
-    this.flightService.find(filter).subscribe(
+    this.flightService.find(this.filter()).subscribe(
       flights => this.flights$.next(flights)
     );
   }
