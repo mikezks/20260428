@@ -6,7 +6,6 @@ import { BehaviorSubject } from 'rxjs';
 import { FlightService } from '../../logic-flight/data-access/flight.service';
 import { FlightCardComponent } from '../../ui-flight/flight-card/flight-card.component';
 import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filter.component';
-import { SIGNAL } from '@angular/core/primitives/signals';
 
 
 @Component({
@@ -44,8 +43,6 @@ export class FlightSearchComponent {
       this.filter();
       untracked(() => this.search());
     });
-
-    console.log(this.route[SIGNAL]);
   }
 
   protected search(): void {
