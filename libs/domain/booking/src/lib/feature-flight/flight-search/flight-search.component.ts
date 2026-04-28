@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight } from '@flight-demo/domain/booking-api-boarding';
 import { FlightService } from '../../logic-flight/data-access/flight.service';
@@ -27,11 +27,18 @@ export class FlightSearchComponent {
     to: 'New York',
     urgent: false
   });
+  protected readonly route = computed(
+    () => 'From ' + this.filter().from + ' to ' + this.filter().to + '.'
+  );
   protected basket: Record<number, boolean> = {
     3: true,
     5: true
   };
   protected flights$ = new BehaviorSubject<Flight[]>([]);
+
+  constructor() {
+    effect(() => console.log(this.route()));
+  }
 
   protected search(filter: FlightFilter): void {
     this.filter.set(filter);
