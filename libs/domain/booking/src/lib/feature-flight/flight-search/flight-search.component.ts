@@ -25,10 +25,6 @@ export class FlightSearchComponent {
   protected readonly basket = this.store.basket;
   protected readonly flights = this.store.flights;
 
-  constructor() {
-    this.store.loadFlights(this.store.filter);
-  }
-
   protected delay(flight: Flight): void {
     const oldFlight = flight;
     const oldDate = new Date(oldFlight.date);
