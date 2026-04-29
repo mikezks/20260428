@@ -1,6 +1,6 @@
 import { httpResource } from '@angular/common/http';
 import { Component, input, numberAttribute } from '@angular/core';
-import { form, FormField, required, schema, SchemaPath, validate } from '@angular/forms/signals';
+import { form, FormField, FormRoot, required, schema, SchemaPath, validate } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
 
@@ -38,6 +38,7 @@ export const passengerSchema = schema<Passenger>(passengerPath => {
     RouterLink,
     // (4) UI Control: Template Binding
     FormField,
+    FormRoot
   ],
   templateUrl: './passenger-edit.component.html'
 })
@@ -51,7 +52,9 @@ export class PassengerEditComponent {
   }), { defaultValue: initialPassenger });
 
   // (2) Field State: value, valid, touched, dirty, ...
-  protected readonly editForm = form(this.passengerResource.value, passengerSchema);
+  protected readonly editForm = form(this.passengerResource.value, passengerSchema, {
+    submission: { action: async () => this.save() }
+  });
 
   protected save(): void {
     console.log({
