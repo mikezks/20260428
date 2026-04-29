@@ -1,37 +1,41 @@
 import { httpResource } from '@angular/common/http';
-import { Component, input, linkedSignal, numberAttribute } from '@angular/core';
-import { apply, form, FormField, FormRoot, required, schema, SchemaPath, validate } from '@angular/forms/signals';
+import { Component, computed, input, linkedSignal, numberAttribute } from '@angular/core';
+import { apply, createMetadataKey, form, FormField, FormRoot, metadata, required, schema, SchemaPath, validate } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
 import { Address, AddressControl, addressSchema, initialAddress } from '@flight-demo/shared/core';
 
 
+const ALLOWED_LASTNAMES = createMetadataKey<string[]>();
+
 export function validateLastname(
   field: SchemaPath<string>,
-  allowedLastnames: string[],
   message: string
 ): void {
-  validate(field, ({ value }) =>
-    allowedLastnames.includes(value())
+  validate(field, ({ value, fieldTree }) => {
+    const allowedLastnames = fieldTree().metadata(ALLOWED_LASTNAMES)?.() || [];
+    return allowedLastnames.includes(value())
       ? null
       : {
         kind: 'forbiddenLastname',
-        message: message + 'Enter one of the following names: '
-          + allowedLastnames.join(', ')
+        message
       }
-  );
+  });
 }
 
 // (3) Field Logic: Validators, conditional disabled, ...
 export const passengerSchema = schema<Passenger & {
   address: Address
 }>(passengerPath => {
+  metadata(passengerPath.name, ALLOWED_LASTNAMES, () => [
+    'Mustermann', 'Smith'
+  ]);
   required(passengerPath.name, {
     message: 'The lastname is mandatory!'
   });
-  validateLastname(passengerPath.name, [
-    'Mustermann', 'Smith'
-  ], 'The lastname is invalid. ');
+  validateLastname(passengerPath.name,
+    'The lastname is invalid. '
+  );
   apply(passengerPath.address, addressSchema);
 });
 
@@ -65,6 +69,10 @@ export class PassengerEditComponent {
   protected readonly editForm = form(this.passengerWithAddress, passengerSchema, {
     submission: { action: async () => this.save() }
   });
+
+  protected readonly allowedLastnames = computed(
+    () => this.editForm.name().metadata(ALLOWED_LASTNAMES)?.()?.join(', ') || ''
+  );
 
   protected save(): void {
     console.log({
