@@ -1,8 +1,9 @@
 import { httpResource } from '@angular/common/http';
-import { Component, input, numberAttribute } from '@angular/core';
-import { form, FormField, FormRoot, required, schema, SchemaPath, validate } from '@angular/forms/signals';
+import { Component, input, linkedSignal, numberAttribute } from '@angular/core';
+import { apply, form, FormField, FormRoot, required, schema, SchemaPath, validate } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
+import { Address, AddressControl, addressSchema, initialAddress } from '@flight-demo/shared/core';
 
 
 export function validateLastname(
@@ -22,13 +23,16 @@ export function validateLastname(
 }
 
 // (3) Field Logic: Validators, conditional disabled, ...
-export const passengerSchema = schema<Passenger>(passengerPath => {
+export const passengerSchema = schema<Passenger & {
+  address: Address
+}>(passengerPath => {
   required(passengerPath.name, {
     message: 'The lastname is mandatory!'
   });
   validateLastname(passengerPath.name, [
     'Mustermann', 'Smith'
   ], 'The lastname is invalid. ');
+  apply(passengerPath.address, addressSchema);
 });
 
 
@@ -38,7 +42,8 @@ export const passengerSchema = schema<Passenger>(passengerPath => {
     RouterLink,
     // (4) UI Control: Template Binding
     FormField,
-    FormRoot
+    FormRoot,
+    AddressControl
   ],
   templateUrl: './passenger-edit.component.html'
 })
@@ -51,15 +56,21 @@ export class PassengerEditComponent {
     params: { id: this.id() }
   }), { defaultValue: initialPassenger });
 
+  private readonly passengerWithAddress = linkedSignal(() => ({
+    ...this.passengerResource.value(),
+    address: initialAddress
+  }));
+
   // (2) Field State: value, valid, touched, dirty, ...
-  protected readonly editForm = form(this.passengerResource.value, passengerSchema, {
+  protected readonly editForm = form(this.passengerWithAddress, passengerSchema, {
     submission: { action: async () => this.save() }
   });
 
   protected save(): void {
     console.log({
       form: this.editForm().value(),
-      resource: this.passengerResource.value()
+      resource: this.passengerResource.value(),
+      linkedDataModel: this.passengerWithAddress()
     });
   }
 }

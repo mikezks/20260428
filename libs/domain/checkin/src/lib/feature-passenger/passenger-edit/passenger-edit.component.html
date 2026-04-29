@@ -38,6 +38,8 @@
         <input id="status" [formField]="editForm.passengerStatus" class="form-control" />
       </div>
 
+      <app-address-subform [formField]="editForm.address" />
+
       <div class="form-group">
         <a
           [routerLink]="['..', this.id()-20]"
