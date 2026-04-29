@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Flight } from '@flight-demo/domain/booking-api-boarding';
 import { BehaviorSubject } from 'rxjs';
@@ -20,7 +20,6 @@ import { FlightFilterComponent } from '../../ui-flight/flight-filter/flight-filt
 })
 export class FlightSearchComponent {
   private readonly flightService = inject(FlightService);
-  private readonly cdRef = inject(ChangeDetectorRef);
 
   protected readonly filter = signal({
     from: 'Paris',
@@ -35,7 +34,6 @@ export class FlightSearchComponent {
     5: true
   };
   protected flights$ = new BehaviorSubject<Flight[]>([]);
-  protected firstname = 'Mary';
 
   constructor() {
     effect(() => console.log(this.route()));
@@ -45,12 +43,6 @@ export class FlightSearchComponent {
       this.filter();
       untracked(() => this.search());
     });
-
-    setTimeout(() => {
-      this.firstname = 'Peter';
-      console.log(this.firstname);
-      // this.cdRef.markForCheck();
-    }, 5_000);
   }
 
   protected search(): void {
