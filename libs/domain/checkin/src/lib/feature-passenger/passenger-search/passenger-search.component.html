@@ -10,7 +10,7 @@
         <input id="firstname" [formField]="filterForm.firstname" type="string" class="form-control" />
       </div>
       @for (error of filterForm.firstname().errors(); track error.kind) {
-        <div>{{ error.message }}</div>
+        <div class="alert alert-danger">{{ error.message }}</div>
       }
 
       <div class="form-group">
@@ -18,7 +18,7 @@
         <input id="name" [formField]="filterForm.lastname" type="string" class="form-control" />
       </div>
       @for (error of filterForm.lastname().errors(); track error.kind) {
-        <div>{{ error.message }}</div>
+        <div class="alert alert-danger">{{ error.message }}</div>
       }
 
       <div class="form-group">
