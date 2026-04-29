@@ -1,4 +1,4 @@
-@let flights = this.flights();
+@let flights = store.flightEntities();
 
 <div class="card">
   <div class="card-header">
@@ -7,7 +7,7 @@
   
   <div class="card-body">
     <app-flight-filter
-      [filter]="filter()"
+      [filter]="store.filter()"
       (filterChange)="store.setFilter($event)"
     >
       @if (flights.length) {
@@ -16,12 +16,12 @@
         </div>
       }
       @if (flights.length) {
-        <button (click)="reset()"
+        <button (click)="store.resetFlights()"
           class="btn btn-default flight-filter-button"
         >Reset</button>
       }
     </app-flight-filter>
-    <p>{{ route() }}</p>
+    <p>{{ store.route() }}</p>
   </div>
 </div>
 
@@ -30,10 +30,10 @@
     <div class="col-xs-12 col-sm-6 col-md-4">
       <app-flight-card
         [item]="flight"
-        [selected]="basket()[flight.id]"
-        (delayTrigger)="delay($event)"
+        [selected]="store.basket()[flight.id]"
+        (selectedChange)="store.updateBasket(flight.id, $event)"
+        (delayTrigger)="store.delayFlight(flight.id)"
       />
-        <!-- (selectedChange)="basket[flight.id]" -->
     </div>
   }
 </div>
@@ -43,6 +43,6 @@
     <h2 class="card-title">Basket</h2>
   </div>
   <div class="card-body">
-    <pre>{{ basket() | json }}</pre>
+    <pre>{{ store.basket() | json }}</pre>
   </div>
 </div>
