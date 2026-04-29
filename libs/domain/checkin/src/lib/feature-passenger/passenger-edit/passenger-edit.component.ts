@@ -1,11 +1,16 @@
 import { httpResource } from '@angular/common/http';
 import { Component, effect, input, numberAttribute, signal } from '@angular/core';
-import { form, FormField } from '@angular/forms/signals';
+import { form, FormField, required, schema } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { initialPassenger, Passenger } from '../../logic-passenger/model/passenger';
 
 
 // (3) Field Logic: Validators, conditional disabled, ...
+export const passengerSchema = schema<Passenger>(passengerPath => {
+  required(passengerPath.name, {
+    message: 'The lastname is mandatory!'
+  });
+});
 
 
 @Component({
@@ -22,7 +27,7 @@ export class PassengerEditComponent {
   private readonly passenger = signal(initialPassenger);
 
   // (2) Field State: value, valid, touched, dirty, ...
-  protected editForm = form(this.passenger);
+  protected editForm = form(this.passenger, passengerSchema);
 
   readonly id = input(0, { transform: numberAttribute });
   protected readonly passengerResource = httpResource<Passenger>(() => ({
