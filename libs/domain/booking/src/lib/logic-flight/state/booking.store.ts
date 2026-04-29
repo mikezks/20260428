@@ -1,5 +1,5 @@
 import { tapResponse } from '@ngrx/operators';
-import { patchState, signalStore, type, withComputed, withHooks, withMethods, withState } from '@ngrx/signals';
+import { patchState, signalStore, type, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals';
 import { entityConfig, removeAllEntities, setAllEntities, updateEntity, withEntities } from '@ngrx/signals/entities';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { Flight } from '../model/flight';
@@ -7,7 +7,7 @@ import { FlightFilter } from '../model/flight-filter';
 import { pipe, switchMap } from 'rxjs';
 import { inject } from '@angular/core';
 import { FlightService } from '../data-access/flight.service';
-import { addMinutes } from '@flight-demo/shared/core';
+import { addMinutes, delegated } from '@flight-demo/shared/core';
 
 export interface BookingState {
   filter: FlightFilter;
@@ -60,6 +60,12 @@ export const BookingStore = signalStore(
         [id]: selected
       }
     })),
+  })),
+  withProps(store => ({
+    writableFilter: delegated(
+      store.filter,
+      store.setFilter
+    ),
   })),
   // Side-Effects
   withMethods((

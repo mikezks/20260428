@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { form, FormField, required } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
-import { Passenger, PassengerFilter } from '../../logic-passenger/model/passenger';
+import { Passenger } from '../../logic-passenger/model/passenger';
 import { PassengerStore } from '../../logic-passenger/state/passenger.signal.store';
 
 
@@ -16,10 +16,7 @@ import { PassengerStore } from '../../logic-passenger/state/passenger.signal.sto
 export class PassengerSearchComponent {
   private store = inject(PassengerStore);
 
-  private passengerFilter = signal<PassengerFilter>({
-    firstname: '',
-    lastname: 'Smith'
-  });
+  private passengerFilter = this.store.writableFilter;
   protected filterForm = form(this.passengerFilter, filterPath => {
     required(filterPath.firstname, {
       message: 'Firstname or lastname need to be entered.',
